@@ -33,7 +33,7 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 ***************************************************************/
 
 //Generate CSS code for a background image if a post has a featured image
-function background_image_css( $postID ) {
+function featured_image_css( $postID ) {
   $css = "";
   
   if ( has_post_thumbnail( $postID ) ) {
@@ -47,7 +47,7 @@ function background_image_css( $postID ) {
 //Generate HTML for featured image block in grid
 function featured_image_block( $postID, $height ) {
   
-  $html = "<div class='col-bg' style='" . background_image_css( $postID ) . " height: " . $height . ";'>"; 
+  $html = "<div class='col-bg' style='" . featured_image_css( $postID ) . " height: " . $height . ";'>"; 
   $html .= "</div>";
   
   return $html;
@@ -63,7 +63,7 @@ function create_column( $columns, $post, $height ) {
   $html .= "<a href='" . post_permalink( $post->ID ) . "'>";
   //Create container for post featured image
   $html .= featured_image_block( $post->ID, $height ) . "</a>";
-  //Create permalink for the post
+  //Create permalink with post title 
   $html .= "<a href='" . post_permalink( $post->ID ) . "'>" . $post->post_title . "</a>";
   //Close the column div
   $html .= "</div>";
@@ -73,7 +73,7 @@ function create_column( $columns, $post, $height ) {
 
 
 //Generate HTML code based on an array of posts and columns
-function postarray_to_html( $post_array, $columns, $height ) {
+function create_grid( $post_array, $columns, $height ) {
   $counter = 0;
   $theHTML = "";
   
@@ -85,7 +85,7 @@ function postarray_to_html( $post_array, $columns, $height ) {
     for ( $x = 0; $x < $columns && $counter < count( $post_array ); $x++ ) {
       
       //Create new column
-      $theHTML .= create_column($columns, $post_array[$counter], $height);
+      $theHTML .= create_column( $columns, $post_array[$counter], $height );
 
       //Increment counter
       $counter++;
@@ -130,7 +130,7 @@ function postgrid_func( $atts ) {
     $posts_array = get_posts( $postargs );
   
     //Generate HTML of given post data
-    $html = postarray_to_html( $posts_array, $a['cols'],  $a['height']);
+    $html = create_grid( $posts_array, $a['cols'],  $a['height']);
 
     return $html;
 }
