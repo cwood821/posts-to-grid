@@ -43,6 +43,35 @@ function background_image_css( $postID ) {
   return $css;
 }
 
+
+//Generate HTML for featured image block in grid
+function featured_image_block( $postID, $height ) {
+  
+  $html = "<div class='col-bg' style='" . background_image_css( $postID ) . " height: " . $height . ";'>"; 
+  $html .= "</div>";
+  
+  return $html;
+}
+
+
+//Generate new grid column based on parameters
+function create_column( $columns, $post, $height ) {
+  $html = "";
+  //Open a new column div with appropriate class
+  $html .= "<div class='col-1-{$columns}'>";
+  //Create a link around the featured image container
+  $html .= "<a href='" . post_permalink( $post->ID ) . "'>";
+  //Create container for post featured image
+  $html .= featured_image_block( $post->ID, $height ) . "</a>";
+  //Create permalink for the post
+  $html .= "<a href='" . post_permalink( $post->ID ) . "'>" . $post->post_title . "</a>";
+  //Close the column div
+  $html .= "</div>";
+  
+  return $html;
+}
+
+
 //Generate HTML code based on an array of posts and columns
 function postarray_to_html( $post_array, $columns, $height ) {
   $counter = 0;
@@ -54,16 +83,9 @@ function postarray_to_html( $post_array, $columns, $height ) {
     
     //Loop through number of columns
     for ( $x = 0; $x < $columns && $counter < count( $post_array ); $x++ ) {
-      //Open a new column div with appropriate class
-      $theHTML .= "<div class='col-1-{$columns}'>";
-      //Create a link around the featured image container
-      $theHTML .= "<a href='" . post_permalink( $post_array[$counter]->ID ) . "'>";
-      //Create container for post featured image
-      $theHTML .= "<div class='col-bg' style='" . background_image_css( $post_array[$counter]->ID ) . " height: " . $height . ";'></div></a>";
-      //Create permalink for the post
-      $theHTML .= "<a href='" . post_permalink( $post_array[$counter]->ID ) . "'>" . $post_array[$counter]->post_title . "</a>";
-      //Close the column div
-      $theHTML .= "</div>";
+      
+      //Create new column
+      $theHTML .= create_column($columns, $post_array[$counter], $height);
 
       //Increment counter
       $counter++;
