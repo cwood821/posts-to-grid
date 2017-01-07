@@ -30,17 +30,17 @@ function prefix_add_my_stylesheet() {
     wp_register_style( 'prefix-style', plugins_url('style.css', __FILE__) );
     wp_enqueue_style( 'prefix-style' );
 }
-// Register with hook 'wp_enqueue_scripts', which can be used for front end CSS and JavaScript
+
 add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 
 
 
 
 /**************************************************************
-  Generate HTML & CSS for the Post grid
+  Generate HTML & CSS for the post grid
 ***************************************************************/
 
-//Generate CSS code for a background image if a post has a featured image
+//Generates CSS code for a background image if a post has a featured image
 function featured_image_css( $postID ) {
   $css = "";
   
@@ -52,7 +52,7 @@ function featured_image_css( $postID ) {
 }
 
 
-//Generate HTML for featured image block in grid
+//Generates HTML for featured image block in grid
 function featured_image_block( $postID, $height ) {
   
   $html = "<div class='ptd_col-bg' style='" . featured_image_css( $postID ) . " height: " . $height . ";'>"; 
@@ -120,7 +120,7 @@ function postgrid_handler( $atts ) {
       // Short Code specific args
       'cols' => '3',
       'height' => '15em',
-      // These are all the get_post() params with sensible defaults
+      // These are all the get_post() args with sensible defaults
       // https://developer.wordpress.org/reference/functions/get_posts/
       'posts_per_page'   => 6,  
       'offset'           => 0,
