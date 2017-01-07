@@ -1,3 +1,8 @@
+/*
+  CSS for basic, responsive grid. 
+  Classes like are namespaced to avoid conflicts with themes.
+*/
+
 .ptd_grid {
   display: block;
   width: 100%;
