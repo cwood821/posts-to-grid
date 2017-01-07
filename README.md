@@ -9,7 +9,7 @@ Besides accepting the arguments listed in the [get_posts()](https://codex.wordpr
 <table>
     <tr>
         <td>cols</td>
-        <td>The number of columbs (1-4) that you want the outputted grid to have. Defaults to 3.</td>
+        <td>The number of columns (1-4) that you want the outputted grid to have. Defaults to 3.</td>
     </tr>    
     <tr>
         <td>height</td>
