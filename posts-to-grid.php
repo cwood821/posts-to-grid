@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Posts to Grid
-  Description: Show Recent Posts in a Grid via [postgrid] shortcode.
+  Description: Show Recent Posts in a Grid via [postgrid ...] shortcode.
   Author: Christian Wood
   Version: 0.2
   Author URI: http://www.christianwood.net/
@@ -21,7 +21,6 @@ function prefix_add_my_stylesheet() {
     wp_register_style( 'prefix-style', plugins_url('style.css', __FILE__) );
     wp_enqueue_style( 'prefix-style' );
 }
-
 // Register with hook 'wp_enqueue_scripts', which can be used for front end CSS and JavaScript
 add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 
@@ -105,66 +104,67 @@ function create_grid( $post_array, $columns, $height ) {
 ***************************************************************/
 
 // Return HTML shortcode
-function postgrid_func( $atts ) {
+function postgrid_handler( $atts ) {
+    //Short code default parameters
+    $defaults = array(
+      // Short Code specific args
+      'cols' => '3',
+      'height' => '15em',
+      // These are all the get_post() params with sensible defaults
+      // https://developer.wordpress.org/reference/functions/get_posts/
+      'posts_per_page'   => 6,  
+      'offset'           => 0,
+      'category'         => '',
+      'category_name'    => '',
+      'orderby'          => 'date',
+      'order'            => 'DESC',
+      'include'          => '',
+      'exclude'          => '',
+      'meta_key'         => '',
+      'meta_value'       => '',
+      'post_type'        => 'post',
+      'post_mime_type'   => '',
+      'post_parent'      => '',
+      'author'	   => '',
+      'author_name'	   => '',
+      'post_status'      => 'publish',
+      'suppress_filters' => true 
+    );
     
-    //Store Short code attributes
-    $a = shortcode_atts( array(
-        // Short Code specific args
-        'cols' => '3',
-        'height' => '15em',
-        // These are all the get_post() params with sensible defaults
-        // https://developer.wordpress.org/reference/functions/get_posts/
-        'posts_per_page'   => 6,  
-        'offset'           => 0,
-        'category'         => '',
-        'category_name'    => '',
-        'orderby'          => 'date',
-        'order'            => 'DESC',
-        'include'          => '',
-        'exclude'          => '',
-        'meta_key'         => '',
-        'meta_value'       => '',
-        'post_type'        => 'post',
-        'post_mime_type'   => '',
-        'post_parent'      => '',
-        'author'	   => '',
-        'author_name'	   => '',
-        'post_status'      => 'publish',
-        'suppress_filters' => true 
-    ), $atts );
+    //Store passed short code attributes, add deafults
+    $scAtts = shortcode_atts( $defaults, $atts );
   
     //Set up posts posts arguments array
     $postargs = array(
-      'posts_per_page'   => $a['posts_per_page'],
-      'offset'           => $a['offset'],
-      'category'         => $a['category'],
-      'category_name'    => $a['category_name'],
-      'orderby'          => $a['orderby'],
-      'order'            => $a['order'],
-      'include'          => $a['include'],
-      'exclude'          => $a['exclude'],
-      'meta_key'         => $a['meta_key'],
-      'meta_value'       => $a['meta_value'],
-      'post_type'        => $a['post_type'],
-      'post_mime_type'   => $a['post_mime_type'],
-      'post_parent'      => $a['post_parent'],
-      'author'	         => $a['author'],,
-      'author_name'	     => $a['author_name'],
-      'post_status'      => $a['post_status'],
-      'suppress_filters' => $a['suppress_filters'],
+      'posts_per_page'   => $scAtts['posts_per_page'],
+      'offset'           => $scAtts['offset'],
+      'category'         => $scAtts['category'],
+      'category_name'    => $scAtts['category_name'],
+      'orderby'          => $scAtts['orderby'],
+      'order'            => $scAtts['order'],
+      'include'          => $scAtts['include'],
+      'exclude'          => $scAtts['exclude'],
+      'meta_key'         => $scAtts['meta_key'],
+      'meta_value'       => $scAtts['meta_value'],
+      'post_type'        => $scAtts['post_type'],
+      'post_mime_type'   => $scAtts['post_mime_type'],
+      'post_parent'      => $scAtts['post_parent'],
+      'author'	         => $scAtts['author'],
+      'author_name'	     => $scAtts['author_name'],
+      'post_status'      => $scAtts['post_status'],
+      'suppress_filters' => $scAtts['suppress_filters']
     );
-  
   
     //Get array of posts with given args
     $posts_array = get_posts( $postargs );
   
     //Generate HTML of given post data
-    $html = create_grid( $posts_array, $a['cols'], $a['height'] );
+    $html = create_grid( $posts_array, $scAtts['cols'], $scAtts['height'] );
 
     return $html;
 }
 
-add_shortcode( 'postgrid', 'postgrid_func' );
+add_shortcode( 'postgrid', 'postgrid_handler' );
 
 
 
