@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Posts to Grid
-  Description: Show Recent Posts in a Grid via [postgrid ...] shortcode.
+  Description: Show Recent Posts in a Grid via [postgrid ...] shortcode. Takes all get_post parameters.
   Author: Christian Wood
   Version: 0.2
   Author URI: http://www.christianwood.net/
