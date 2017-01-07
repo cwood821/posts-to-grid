@@ -2,9 +2,9 @@
 /*
   Plugin Name: Posts to Grid
   Description: Show Recent Posts in a Grid via [postgrid] shortcode.
-  Author: Utopian Slingshot
-  Version: 0.1
-  Author URI: http://utopianslingshot.com
+  Author: Christian Wood
+  Version: 0.2
+  Author URI: http://www.christianwood.net/
 */
 
 
@@ -29,7 +29,7 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 
 
 /**************************************************************
-  Generate HTML & CSS for the post grid
+  Generate HTML & CSS for the Post grid
 ***************************************************************/
 
 //Generate CSS code for a background image if a post has a featured image
@@ -47,7 +47,7 @@ function featured_image_css( $postID ) {
 //Generate HTML for featured image block in grid
 function featured_image_block( $postID, $height ) {
   
-  $html = "<div class='col-bg' style='" . featured_image_css( $postID ) . " height: " . $height . ";'>"; 
+  $html = "<div class='ptd_col-bg' style='" . featured_image_css( $postID ) . " height: " . $height . ";'>"; 
   $html .= "</div>";
   
   return $html;
@@ -58,7 +58,7 @@ function featured_image_block( $postID, $height ) {
 function create_column( $columns, $post, $height ) {
   $html = "";
   //Open a new column div with appropriate class
-  $html .= "<div class='col-1-{$columns}'>";
+  $html .= "<div class='ptd_col-1-{$columns}'>";
   //Create a link around the featured image container
   $html .= "<a href='" . post_permalink( $post->ID ) . "'>";
   //Create container for post featured image
@@ -75,27 +75,27 @@ function create_column( $columns, $post, $height ) {
 //Generate HTML code based on an array of posts and columns
 function create_grid( $post_array, $columns, $height ) {
   $counter = 0;
-  $theHTML = "";
+  $html = "";
   
   while( $counter < count( $post_array ) ) {
     //Open new grid row
-    $theHTML .= "<div class='grid'>";
+    $html .= "<div class='ptd_grid'>";
     
-    //Loop through number of columns
+    //Loop through number of columns given
     for ( $x = 0; $x < $columns && $counter < count( $post_array ); $x++ ) {
       
       //Create new column
-      $theHTML .= create_column( $columns, $post_array[$counter], $height );
+      $html .= create_column( $columns, $post_array[$counter], $height );
 
       //Increment counter
       $counter++;
     }
     
     //Close grid row
-    $theHTML .= "</div>";
+    $html .= "</div>";
   } //End While
 
-  return $theHTML;
+  return $html;
 }
 
 
@@ -109,28 +109,57 @@ function postgrid_func( $atts ) {
     
     //Store Short code attributes
     $a = shortcode_atts( array(
+        // Short Code specific args
         'cols' => '3',
-        'posttype' => 'post',
-        'max' => '3',
         'height' => '15em',
+        // These are all the get_post() params with sensible defaults
+        // https://developer.wordpress.org/reference/functions/get_posts/
+        'posts_per_page'   => 6,  
+        'offset'           => 0,
+        'category'         => '',
+        'category_name'    => '',
+        'orderby'          => 'date',
+        'order'            => 'DESC',
+        'include'          => '',
+        'exclude'          => '',
+        'meta_key'         => '',
+        'meta_value'       => '',
+        'post_type'        => 'post',
+        'post_mime_type'   => '',
+        'post_parent'      => '',
+        'author'	   => '',
+        'author_name'	   => '',
+        'post_status'      => 'publish',
+        'suppress_filters' => true 
     ), $atts );
   
     //Set up posts posts arguments array
     $postargs = array(
-      'posts_per_page'   => $a['max'],
-      'offset'           => 0,
-      'orderby'          => 'date',
-      'order'            => 'DESC',
-      'post_type'        => $a['posttype'],
-      'post_status'      => 'publish',
-      'suppress_filters' => true 
+      'posts_per_page'   => $a['posts_per_page'],
+      'offset'           => $a['offset'],
+      'category'         => $a['category'],
+      'category_name'    => $a['category_name'],
+      'orderby'          => $a['orderby'],
+      'order'            => $a['order'],
+      'include'          => $a['include'],
+      'exclude'          => $a['exclude'],
+      'meta_key'         => $a['meta_key'],
+      'meta_value'       => $a['meta_value'],
+      'post_type'        => $a['post_type'],
+      'post_mime_type'   => $a['post_mime_type'],
+      'post_parent'      => $a['post_parent'],
+      'author'	         => $a['author'],,
+      'author_name'	     => $a['author_name'],
+      'post_status'      => $a['post_status'],
+      'suppress_filters' => $a['suppress_filters'],
     );
+  
   
     //Get array of posts with given args
     $posts_array = get_posts( $postargs );
   
     //Generate HTML of given post data
-    $html = create_grid( $posts_array, $a['cols'],  $a['height']);
+    $html = create_grid( $posts_array, $a['cols'], $a['height'] );
 
     return $html;
 }
