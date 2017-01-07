@@ -23,6 +23,6 @@ Besides accepting the arguments listed in the [get_posts()](https://codex.wordpr
 
 
 # Future Development
--Refine responsive image integration
--Add option to choose the featured image size (instead of defaulting to large)
--Add a WordPress Admin Settings page
+  - Refine responsive image integration
+  - Add option to choose the featured image size (instead of defaulting to large)
+  - Add a WordPress Admin Settings page
