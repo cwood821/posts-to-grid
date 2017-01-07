@@ -1,5 +1,5 @@
 # Posts-to-Grid
-Posts-to-Grid provides provides access to the WordPress [get_posts()](https://codex.wordpress.org/Template_Tags/get_posts) function via a shortcode. Posts are outputted as a grid of featured images with the post title as a link below each grid element.
+Posts-to-Grid provides access to the WordPress [get_posts()](https://codex.wordpress.org/Template_Tags/get_posts) function via a shortcode. Posts are outputted as a grid of featured images with the post title as a link below each grid element.
 
 ## The Shortcode
 [postgrid ...]
