@@ -1,13 +1,22 @@
 <?php
 /*
-  Plugin Name: Posts to Grid
-  Description: Show Recent Posts in a Grid via [postgrid ...] shortcode. Takes all get_post parameters.
-  Author: Christian Wood
-  Version: 0.2
-  Author URI: http://www.christianwood.net/
+ * Plugin Name: Posts to Grid
+ * Version: 1.0
+ * Plugin URI: http://www.christianwood.net/
+ * Description: Show Recent Posts in a Grid via [postgrid ...] shortcode. Takes all get_post parameters.
+ * Author: Christian Wood
+ * Author URI: http://www.christianwood.net/
+ * Requires at least: 4.7
+ * Tested up to: 4.7
+ *
 */
 
 
+/**************************************************************
+  Security
+***************************************************************/
+
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 
@@ -96,6 +105,7 @@ function create_grid( $post_array, $columns, $height ) {
 
   return $html;
 }
+
 
 
 
