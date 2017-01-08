@@ -14,6 +14,10 @@ Besides accepting the arguments listed in the [get_posts()](https://codex.wordpr
     <tr>
         <td>height</td>
         <td>The height of the featured image blocks in the grid, formatted as a CSS value (e.g. '15em', '200px'). Defaults to 15em.</td>
+    </tr>    
+    <tr>
+        <td>thumbnail_size</td>
+        <td>The size of the featured image shown in each grid block background. Accepts WordPress defaults for [thumbnail sizes](https://codex.wordpress.org/Post_Thumbnails).</td>
     </tr>
 </table>
 
@@ -22,7 +26,16 @@ Besides accepting the arguments listed in the [get_posts()](https://codex.wordpr
 [postgrid cols="3" posts_per_page="3" height="15em"]
 
 
-# Future Development
+## Future Development
   - Refine responsive image integration
-  - Add option to choose the featured image size (instead of defaulting to large)
   - Add a WordPress Admin Settings page
+
+## License
+
+Copyright 2017 Christian Wood
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
