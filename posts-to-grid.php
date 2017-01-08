@@ -22,6 +22,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 /**************************************************************
+  Includes
+***************************************************************/
+require_once('html-generator.php');
+
+
+
+
+/**************************************************************
   Enqueue plugin CSS file
 ***************************************************************/
 
@@ -40,70 +48,62 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
   Generate HTML & CSS for the post grid
 ***************************************************************/
 
-//Generates CSS code for a background image if a post has a featured image
-function featured_image_css( $postID ) {
-  $css = "";
-  
-  if ( has_post_thumbnail( $postID ) ) {
-    $css = $css . "background: url(" . get_the_post_thumbnail_url( $postID, 'large' ) . ") center center; background-size: cover;";
-  }
-  
-  return $css;
-}
-
-
 //Generates HTML for featured image block in grid
-function featured_image_block( $postID, $height ) {
+function featured_image( $postID, $height, $thumbSize ) {
+  $featImageAtts = array(
+    'class' => 'ptd_col-bg',
+    'style' => array(
+      'background-image' =>  "url(" . get_the_post_thumbnail_url( $postID, $thumbSize ) . ")",
+      'height' => $height,
+    ),
+  );
   
-  $html = "<div class='ptd_col-bg' style='" . featured_image_css( $postID ) . " height: " . $height . ";'>"; 
-  $html .= "</div>";
-  
-  return $html;
+  //Create and return featured image element
+  $featuredImage = new HTMLElement( 'div', $featImageAtts, '' );
+  return $featuredImage->get_element();
 }
 
 
 //Generate new grid column based on parameters
-function create_column( $columns, $post, $height ) {
-  $html = "";
-  //Open a new column div with appropriate class
-  $html .= "<div class='ptd_col-1-{$columns}'>";
-  //Create a link around the featured image container
-  $html .= "<a href='" . post_permalink( $post->ID ) . "'>";
-  //Create container for post featured image
-  $html .= featured_image_block( $post->ID, $height ) . "</a>";
-  //Create permalink with post title 
-  $html .= "<a href='" . post_permalink( $post->ID ) . "'>" . $post->post_title . "</a>";
-  //Close the column div
-  $html .= "</div>";
+function create_column( $columns, $post, $height, $thumbSize ) {
+  $colDivAtts = array(
+    'class' => "ptd_col-1-{$columns}",
+  );
+  $linkAtts = array(
+    'href' => get_permalink( $post->ID ),
+  );
   
-  return $html;
+  //Create featured image block wrapped in an anchor tag
+  $featuredImage = new HTMLElement( 'a', $linkAtts, featured_image( $post->ID, $height, $thumbSize ) );
+  //Create the link to serve as the title under the image
+  $postLink = new HTMLElement( 'a', $linkAtts, $post->post_title );
+  //Combine elements
+  $innerHTML = $featuredImage->get_element() . $postLink->get_element();
+  //Create column element
+  $column = new HTMLElement( 'div', $colDivAtts, $innerHTML );
+  
+  return $column->get_element();
 }
 
 
 //Generate HTML code based on an array of posts and columns
-function create_grid( $post_array, $columns, $height ) {
+function create_grid( $postArray, $columns, $height, $thumbSize ) {
   $counter = 0;
-  $html = "";
+  $innerHTML = "";
   
-  while( $counter < count( $post_array ) ) {
-    //Open new grid row
-    $html .= "<div class='ptd_grid'>";
-    
+  while( $counter < count( $postArray ) ) {
     //Loop through number of columns given
-    for ( $x = 0; $x < $columns && $counter < count( $post_array ); $x++ ) {
-      
+    for ( $x = 0; $x < $columns && $counter < count( $postArray ); $x++ ) {
       //Create new column
-      $html .= create_column( $columns, $post_array[$counter], $height );
-
+      $innerHTML .= create_column( $columns, $postArray[$counter], $height, $thumbSize );
       //Increment counter
       $counter++;
     }
-    
-    //Close grid row
-    $html .= "</div>";
   } //End While
+  
+  $grid = new HTMLElement( 'div', array('class' => 'ptd_grid'), $innerHTML);
 
-  return $html;
+  return $grid->get_element();
 }
 
 
@@ -120,6 +120,7 @@ function postgrid_handler( $atts ) {
       // Short Code specific args
       'cols' => '3',
       'height' => '15em',
+      'thumbnail_size' => 'large',
       // These are all the get_post() args with sensible defaults
       // https://developer.wordpress.org/reference/functions/get_posts/
       'posts_per_page'   => 6,  
@@ -169,13 +170,12 @@ function postgrid_handler( $atts ) {
     $posts_array = get_posts( $postargs );
   
     //Generate HTML of given post data
-    $html = create_grid( $posts_array, $scAtts['cols'], $scAtts['height'] );
+    $html = create_grid( $posts_array, $scAtts['cols'], $scAtts['height'], $scAtts['thumbnail_size'] );
 
     return $html;
 }
 
 add_shortcode( 'postgrid', 'postgrid_handler' );
-
 
 
 
