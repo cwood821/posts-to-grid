@@ -28,6 +28,11 @@ class HTMLElement {
     public function get_atts() {
       return $this->atts;
     }
+  
+    
+    public function get_innerHTML() {
+      return $this->innerHTML;
+    }
 
   
     // Returns HTML tag with attributes and innerHTML as string
@@ -35,7 +40,7 @@ class HTMLElement {
       //Open tag
       $element = "<" .  $this->tag . " ";
       //Add attributes
-      $element .= $this->format_attributes() . ">";
+      $element .= $this->format_string( $this->atts, "=", "'", "'" ) . ">";
       //Add innerHTML and close tag if not a void element
       if ( !$this->is_void() ) {
         $element .= $this->innerHTML;
@@ -45,37 +50,23 @@ class HTMLElement {
       return $element;
     }
   
-     
+       
     // Returns attributes formatted in attribute='value' form;  
-    private function format_attributes() {
-      $attList = "";
-      $attKeys = array_keys( $this->atts );
-      $attValues = array_values( $this->atts );
+    private function format_string($values, $divider, $start, $end) {
+      $str = "";
+      $valKeys = array_keys( $values );
+      $valValues = array_values( $values );
       
-      for ( $i = 0; $i < count( $this->atts ); $i++ ) {
-        // 'style' value is formatted as inline CSS, all others as plain string
-        if( $attKeys[$i] === 'style' ) {
-          $attList .= $attKeys[$i] . "='" . $this->format_css( $attValues[$i] ) . "' ";
+      for ( $i = 0; $i < count( $values ); $i++ ) {
+        // 'style' value is formatted as inline CSS
+        if( $valKeys[$i] === 'style' ) {
+          $str .= $valKeys[$i] . $divider . $start . $this->format_string( $valValues[$i], ":", "", ";"  ) . $end;
         } else {
-          $attList .= $attKeys[$i] . "='" . $attValues[$i] . "' ";
+          $str .= $valKeys[$i] . $divider . $start . $valValues[$i] . $end;
         }
       }
       
-      return $attList;
-    }
-  
-    
-    // Returns CSS properties formatted for an inline style
-    private function format_css( $css ) {
-      $propList = "";
-      $propKeys = array_keys( $css );
-      $propValues = array_values( $css );
-      
-      for ( $i = 0; $i < count( $css ); $i++ ) {
-          $propList .= $propKeys[$i] . ":" . $propValues[$i] . "; ";
-      }
-      
-      return $propList;
+      return $str;
     }
   
   

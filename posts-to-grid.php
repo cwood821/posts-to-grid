@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 
 /**************************************************************
-  Includes
+  Required Files
 ***************************************************************/
 
 require_once('class-html-element.php');
@@ -51,7 +51,7 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
   Generate HTML & CSS for the post grid
 ***************************************************************/
 
-//Generates HTML for featured image block in grid
+// Generates HTML for featured image block in grid
 function featured_image( $post, $scAtts ) {
   $featImageAtts = array(
     'class' => 'ptd_col-bg',
@@ -61,7 +61,7 @@ function featured_image( $post, $scAtts ) {
     ),
   );
   
-  //Create and return featured image element
+  // Create and return featured image element
   $featuredImage = new HTMLElement( 'div', $featImageAtts, '' );
   return $featuredImage->get_element();
 }
@@ -76,13 +76,13 @@ function create_grid_item( $post, $scAtts ) {
     'href' => get_permalink( $post->ID ),
   );
   
-  //Create featured image block wrapped in an anchor tag
+  // Create featured image block wrapped in an anchor tag
   $featuredImage = new HTMLElement( 'a', $linkAtts, featured_image( $post, $scAtts ) );
-  //Create the link to serve as the title under the image
+  // Create the link to serve as the title under the image
   $postLink = new HTMLElement( 'a', $linkAtts, $post->post_title );
-  //Combine elements
+  // Combine elements for inclusion in the column element
   $innerHTML = $featuredImage->get_element() . $postLink->get_element();
-  //Create column element
+  // Create grid column element
   $column = new HTMLElement( 'div', $colDivAtts, $innerHTML );
   
   return $column->get_element();
@@ -96,14 +96,14 @@ function create_grid( $postArray, $scAtts ) {
   $columns = $scAtts['cols'];
   
   while( $counter < count( $postArray ) ) {
-    //Loop through number of columns given
+    // Loop through number of columns given
     for ( $x = 0; $x < $columns && $counter < count( $postArray ); $x++ ) {
-      //Create new column
+      // Create new column
       $innerHTML .= create_grid_item( $postArray[$counter], $scAtts );
-      //Increment counter
+      // Increment counter
       $counter++;
     }
-  } //End While
+  } // End While
   
   $grid = new HTMLElement( 'div', array('class' => 'ptd_grid'), $innerHTML);
 
@@ -119,13 +119,12 @@ function create_grid( $postArray, $scAtts ) {
 
 // Return HTML shortcode
 function postgrid_handler( $atts ) {
-  //Short code default parameters
   $defaults = array(
-    // Short Code specific args
+    // Short Code specific attributes
     'cols' => '3',
     'height' => '15em',
     'thumbnail_size' => 'large',
-    // These are all the get_post() args with sensible defaults
+    // get_post() args with sensible defaults
     // https://developer.wordpress.org/reference/functions/get_posts/
     'posts_per_page'   => 6,  
     'offset'           => 0,
@@ -146,7 +145,7 @@ function postgrid_handler( $atts ) {
     'suppress_filters' => true 
   );
   
-  // Overwrite defaults with passed attributes
+  // Overwrite default  with passed attributes
   $scAtts = shortcode_atts( $defaults, $atts );
   // Get array of posts with given args
   $postsArray = get_posts( $scAtts );
