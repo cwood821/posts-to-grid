@@ -12,6 +12,8 @@
 */
 
 
+
+
 /**************************************************************
   Security
 ***************************************************************/
@@ -24,7 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**************************************************************
   Includes
 ***************************************************************/
-require_once('html-generator.php');
+
+require_once('class-html-element.php');
 
 
 
@@ -49,12 +52,12 @@ add_action( 'wp_enqueue_scripts', 'prefix_add_my_stylesheet' );
 ***************************************************************/
 
 //Generates HTML for featured image block in grid
-function featured_image( $postID, $height, $thumbSize ) {
+function featured_image( $post, $scAtts ) {
   $featImageAtts = array(
     'class' => 'ptd_col-bg',
     'style' => array(
-      'background-image' =>  "url(" . get_the_post_thumbnail_url( $postID, $thumbSize ) . ")",
-      'height' => $height,
+      'background-image' =>  "url(" . get_the_post_thumbnail_url( $post->ID, $scAtts['thumbnail_size'] ) . ")",
+      'height' => $scAtts['height'],
     ),
   );
   
@@ -65,16 +68,16 @@ function featured_image( $postID, $height, $thumbSize ) {
 
 
 //Generate new grid column based on parameters
-function create_column( $columns, $post, $height, $thumbSize ) {
+function create_grid_item( $post, $scAtts ) {
   $colDivAtts = array(
-    'class' => "ptd_col-1-{$columns}",
+    'class' => "ptd_col-1-{$scAtts['cols']}",
   );
   $linkAtts = array(
     'href' => get_permalink( $post->ID ),
   );
   
   //Create featured image block wrapped in an anchor tag
-  $featuredImage = new HTMLElement( 'a', $linkAtts, featured_image( $post->ID, $height, $thumbSize ) );
+  $featuredImage = new HTMLElement( 'a', $linkAtts, featured_image( $post, $scAtts ) );
   //Create the link to serve as the title under the image
   $postLink = new HTMLElement( 'a', $linkAtts, $post->post_title );
   //Combine elements
@@ -86,16 +89,17 @@ function create_column( $columns, $post, $height, $thumbSize ) {
 }
 
 
-//Generate HTML code based on an array of posts and columns
-function create_grid( $postArray, $columns, $height, $thumbSize ) {
+// Generate HTML Grid, creates a row then fills with columns
+function create_grid( $postArray, $scAtts ) {
   $counter = 0;
   $innerHTML = "";
+  $columns = $scAtts['cols'];
   
   while( $counter < count( $postArray ) ) {
     //Loop through number of columns given
     for ( $x = 0; $x < $columns && $counter < count( $postArray ); $x++ ) {
       //Create new column
-      $innerHTML .= create_column( $columns, $postArray[$counter], $height, $thumbSize );
+      $innerHTML .= create_grid_item( $postArray[$counter], $scAtts );
       //Increment counter
       $counter++;
     }
@@ -115,64 +119,41 @@ function create_grid( $postArray, $columns, $height, $thumbSize ) {
 
 // Return HTML shortcode
 function postgrid_handler( $atts ) {
-    //Short code default parameters
-    $defaults = array(
-      // Short Code specific args
-      'cols' => '3',
-      'height' => '15em',
-      'thumbnail_size' => 'large',
-      // These are all the get_post() args with sensible defaults
-      // https://developer.wordpress.org/reference/functions/get_posts/
-      'posts_per_page'   => 6,  
-      'offset'           => 0,
-      'category'         => '',
-      'category_name'    => '',
-      'orderby'          => 'date',
-      'order'            => 'DESC',
-      'include'          => '',
-      'exclude'          => '',
-      'meta_key'         => '',
-      'meta_value'       => '',
-      'post_type'        => 'post',
-      'post_mime_type'   => '',
-      'post_parent'      => '',
-      'author'	   => '',
-      'author_name'	   => '',
-      'post_status'      => 'publish',
-      'suppress_filters' => true 
-    );
-    
-    //Store passed short code attributes, add deafults
-    $scAtts = shortcode_atts( $defaults, $atts );
+  //Short code default parameters
+  $defaults = array(
+    // Short Code specific args
+    'cols' => '3',
+    'height' => '15em',
+    'thumbnail_size' => 'large',
+    // These are all the get_post() args with sensible defaults
+    // https://developer.wordpress.org/reference/functions/get_posts/
+    'posts_per_page'   => 6,  
+    'offset'           => 0,
+    'category'         => '',
+    'category_name'    => '',
+    'orderby'          => 'date',
+    'order'            => 'DESC',
+    'include'          => '',
+    'exclude'          => '',
+    'meta_key'         => '',
+    'meta_value'       => '',
+    'post_type'        => 'post',
+    'post_mime_type'   => '',
+    'post_parent'      => '',
+    'author'	   => '',
+    'author_name'	   => '',
+    'post_status'      => 'publish',
+    'suppress_filters' => true 
+  );
   
-    //Set up posts posts arguments array
-    $postargs = array(
-      'posts_per_page'   => $scAtts['posts_per_page'],
-      'offset'           => $scAtts['offset'],
-      'category'         => $scAtts['category'],
-      'category_name'    => $scAtts['category_name'],
-      'orderby'          => $scAtts['orderby'],
-      'order'            => $scAtts['order'],
-      'include'          => $scAtts['include'],
-      'exclude'          => $scAtts['exclude'],
-      'meta_key'         => $scAtts['meta_key'],
-      'meta_value'       => $scAtts['meta_value'],
-      'post_type'        => $scAtts['post_type'],
-      'post_mime_type'   => $scAtts['post_mime_type'],
-      'post_parent'      => $scAtts['post_parent'],
-      'author'	         => $scAtts['author'],
-      'author_name'	     => $scAtts['author_name'],
-      'post_status'      => $scAtts['post_status'],
-      'suppress_filters' => $scAtts['suppress_filters']
-    );
-  
-    //Get array of posts with given args
-    $posts_array = get_posts( $postargs );
-  
-    //Generate HTML of given post data
-    $html = create_grid( $posts_array, $scAtts['cols'], $scAtts['height'], $scAtts['thumbnail_size'] );
+  // Overwrite defaults with passed attributes
+  $scAtts = shortcode_atts( $defaults, $atts );
+  // Get array of posts with given args
+  $postsArray = get_posts( $scAtts );
+  // Generate HTML grid of posts
+  $html = create_grid( $postsArray, $scAtts );
 
-    return $html;
+  return $html;
 }
 
 add_shortcode( 'postgrid', 'postgrid_handler' );

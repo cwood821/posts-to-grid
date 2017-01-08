@@ -1,7 +1,7 @@
 <?php
 /*
-  HTML Generator Class
-  Pass attributes as an array, pass inline style as an array, also;
+  HTML Element Generator Class
+  Note: Pass attributes as an array, pass inline style as an array, also.
 */
 
 /**************************************************************
@@ -79,7 +79,7 @@ class HTMLElement {
     }
   
   
-    // Returns attributes formatted in attribute='value' form
+    // Returns true/false if the tag is a void HTML element
     private function is_void() {
       $voidElements = array( 
         "area", "base", "br", "col", "embed", 
