@@ -92,10 +92,13 @@ function create_grid_item( $post, $scAtts ) {
 // Generate HTML Grid, creates a row then fills with columns
 function create_grid( $postArray, $scAtts ) {
   $counter = 0;
-  $innerHTML = "";
+  $gridInnerHTML = '';
   $columns = $scAtts['cols'];
   
-  while( $counter < count( $postArray ) ) {
+  //Create
+  while( $counter < count( $postArray ) ) {   
+    $innerHTML = '';
+    
     // Loop through number of columns given
     for ( $x = 0; $x < $columns && $counter < count( $postArray ); $x++ ) {
       // Create new column
@@ -103,10 +106,15 @@ function create_grid( $postArray, $scAtts ) {
       // Increment counter
       $counter++;
     }
+    
+    // Embed the created columns inside a row
+    $gridRow = new HTMLElement( 'div', array('class' => 'ptd_row'), $innerHTML);
+    //Add the row (with colums) into the main grid innerHTML
+    $gridInnerHTML .= $gridRow->get_element();
   } // End While
   
-  $grid = new HTMLElement( 'div', array('class' => 'ptd_grid'), $innerHTML);
-
+  //
+  $grid = new HTMLElement('div', array('class' => 'ptd_grid'), $gridInnerHTML);
   return $grid->get_element();
 }
 
@@ -142,13 +150,17 @@ function postgrid_handler( $atts ) {
     'author'	   => '',
     'author_name'	   => '',
     'post_status'      => 'publish',
-    'suppress_filters' => true 
+    'suppress_filters' => true,
   );
   
   // Overwrite default  with passed attributes
   $scAtts = shortcode_atts( $defaults, $atts );
   // Get array of posts with given args
-  $postsArray = get_posts( $scAtts );
+  $query = new WP_Query( $scAtts );
+  $postsArray = $query->posts;
+  
+  //TODO: Add Pagination support: http://stackoverflow.com/questions/40920538/add-pagination-to-recent-posts-shortcode
+  
   // Generate HTML grid of posts
   $html = create_grid( $postsArray, $scAtts );
 

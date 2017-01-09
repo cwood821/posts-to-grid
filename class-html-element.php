@@ -51,7 +51,7 @@ class HTMLElement {
     }
   
        
-    // Returns attributes formatted in attribute='value' form;  
+    // Returns single line string formatted as key divider start value end, with no spaces.  
     private function format_string($values, $divider, $start, $end) {
       $str = "";
       $valKeys = array_keys( $values );
